@@ -12,37 +12,33 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { LayoutDashboard, Settings, Users, FileText, HelpCircle } from "lucide-react"
+import { LayoutDashboard, Tag } from "lucide-react"
+import Link from "next/link"
+import createLogger from "@/lib/logger"
 
-const items = [
-  {
-    title: "Dashboard",
-    url: "#",
-    icon: LayoutDashboard,
-  },
-  {
-    title: "Users",
-    url: "#",
-    icon: Users,
-  },
-  {
-    title: "Reports",
-    url: "#",
-    icon: FileText,
-  },
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
-  },
-  {
-    title: "Help",
-    url: "#",
-    icon: HelpCircle,
-  },
-]
+const logger = createLogger("AppSidebar")
 
-export function AppSidebar() {
+interface Category {
+  id: string | number
+  name: string
+}
+
+async function getCategories(): Promise<Category[]> {
+  try {
+    const res = await fetch(`${process.env.API_BASE_URL}/api/categories`, {
+      next: { revalidate: 60 },
+    })
+    if (!res.ok) return []
+    return res.json()
+  } catch {
+    return []
+  }
+}
+
+export async function AppSidebar() {
+  const categories = await getCategories()
+  logger.info(`Fetched ${categories.length} categories`)
+
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="h-16 border-b flex items-center px-6">
@@ -55,16 +51,16 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupLabel>Categories</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild tooltip={item.title}>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
+              {categories.map((category) => (
+                <SidebarMenuItem key={category.id}>
+                  <SidebarMenuButton asChild tooltip={category.name}>
+                    <Link href={`/category/${category.id}`}>
+                      <Tag />
+                      <span>{category.name}</span>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
