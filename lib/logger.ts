@@ -7,7 +7,14 @@ function formatMessage(level: LogLevel, name: string, message: unknown): string 
   return `${date} ${level.padEnd(5)} [${name}] - ${msg}`
 }
 
-function createLogger(name: string) {
+export interface Logger {
+  debug: (message: unknown) => void
+  info:  (message: unknown) => void
+  warn:  (message: unknown) => void
+  error: (message: unknown) => void
+}
+
+export function createLogger(name: string): Logger {
   return {
     debug: (message: unknown) => console.debug(formatMessage("DEBUG", name, message)),
     info:  (message: unknown) => console.info(formatMessage("INFO",  name, message)),
@@ -15,5 +22,3 @@ function createLogger(name: string) {
     error: (message: unknown) => console.error(formatMessage("ERROR", name, message)),
   }
 }
-
-export default createLogger

@@ -23,6 +23,7 @@ import {
 import { ChevronRight, LayoutDashboard, Tag } from "lucide-react"
 import Link from "next/link"
 import createLogger from "@/lib/logger"
+import {UUID} from "node:crypto";
 
 const logger = createLogger("AppSidebar")
 
@@ -32,16 +33,16 @@ export type NavItem = {
   children?: NavItem[]
 }
 
-interface Group {
-  id: number
+interface Stream {
+  uuid: string
   name: string
-  children: Group[]
+  children: Stream[]
   sources: unknown[]
 }
 
-async function getGroups(): Promise<Group[]> {
+async function getStreams(): Promise<Stream[]> {
   try {
-    const res = await fetch(`${process.env.API_BASE_URL}/api/reporting/streams/hierarchy`, {
+    const res = await fetch(`${process.env.API_BASE_URL}/api/reporting/streams`, {
       next: { revalidate: 60 },
     })
     if (!res.ok) return []
@@ -51,11 +52,11 @@ async function getGroups(): Promise<Group[]> {
   }
 }
 
-function groupToNavItem(group: Group): NavItem {
+function groupToNavItem(stream: Stream): NavItem {
   return {
-    title: group.name,
-    href: `/category/${group.id}`,
-    children: group.children.map(groupToNavItem),
+    title: stream.name,
+    href: `/stream/${encodeURIComponent(stream.name)}`,
+    children: stream.children.map(groupToNavItem),
   }
 }
 
@@ -130,7 +131,7 @@ function NavSubItemNode({ item }: { item: NavItem }) {
 }
 
 export async function AppSidebar() {
-  const groups = await getGroups()
+  const groups = await getStreams()
   logger.info(`Fetched ${groups.length} groups`)
 
   const navItems: NavItem[] = groups.map(groupToNavItem)

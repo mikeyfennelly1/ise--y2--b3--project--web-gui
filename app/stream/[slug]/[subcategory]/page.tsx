@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Tag } from "lucide-react"
-import { notFound } from "next/navigation"
 import createLogger from "@/lib/logger"
 
 const logger = createLogger("SubcategoryPage")

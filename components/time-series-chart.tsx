@@ -11,16 +11,11 @@ import {
   YAxis,
 } from "recharts"
 
-export interface Producer {
-  id: number
-  name: string
-}
-
 export interface TimeSeriesRecord {
-  id: number
+  id: string
   key: string
   value: number
-  producer: Producer
+  producerName: string
   readTime: string
 }
 
